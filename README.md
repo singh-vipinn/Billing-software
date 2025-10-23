@@ -59,8 +59,8 @@ Responsive UI: Designed UI components for POS layout and tablet/desktop breakpoi
 
 ## Future Enhancements
 
-Payment gateway integration (Razorpay/Stripe)
-Move images to AWS S3 + CDN
-Role-based access (Admin/Cashier) with Spring Security
-PDF invoice generation & download
+Payment gateway integration (Razorpay/Stripe),
+Move images to AWS S3 + CDN,
+Role-based access (Admin/Cashier) with Spring Security,
+PDF invoice generation & download,
 React Native mobile app and analytics dashboard
