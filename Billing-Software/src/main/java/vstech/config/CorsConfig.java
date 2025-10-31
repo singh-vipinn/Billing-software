@@ -15,10 +15,10 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "http://localhost:5173",    // React local dev
-                                "https://billing-software-production-1c35.up.railway.app" // Production
+                                "http://localhost:5173", // local React
+                                "https://billing-software-git-main-vipin-singh-s-projects.vercel.app" // ✅ your Vercel frontend
                         )
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
