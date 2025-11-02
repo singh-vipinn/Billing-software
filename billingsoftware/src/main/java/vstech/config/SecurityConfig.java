@@ -18,8 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
@@ -32,19 +32,16 @@ public class SecurityConfig {
     private final JwtRequestFilter jwtRequestFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ use this method
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+        http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/encode", "/uploads/**").permitAll()
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/encode", "/uploads/**")
+                        .permitAll()
                         .requestMatchers("/categories", "/items", "/orders", "/payments", "/dashboard").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
@@ -53,24 +50,17 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ Centralized CORS Configuration
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsFilter corsFilter() {
+        return new CorsFilter(corsConfigurationSource());
+    }
+
+    private UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
-        // Allow both local dev and deployed frontend
-        config.setAllowedOrigins(List.of(
-                "http://localhost:5173",
-                "https://billing-software-git-main-vipin-singh-s-projects.vercel.app"
-        ));
-
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
-
-        // ✅ Optional but recommended:
-        // to expose the Authorization header in frontend responses
-        config.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -84,4 +74,6 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(authProvider);
     }
+
+
 }
